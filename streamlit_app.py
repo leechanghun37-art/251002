@@ -181,7 +181,7 @@ with col1:
     </div>
     """, unsafe_allow_html=True)
     found_delta = None
-    if st.button("그래프 그리기 및 δ-ε 시각화"):
+    if st.button("그래프 그리기 및 δ-ε 시각화", key="draw_graph_delta_epsilon_1"):
         # 모든 ε에 대해 δ(최대 δ) 값 계산
         epsilons = np.linspace(0.01, 2.0, 30)
         deltas = []
@@ -238,7 +238,7 @@ with col1:
         else:
             st.markdown("<div class='result-card' style='background:#ffebee;border-color:#ffcdd2;color:#c62828;'><b>해당 ε에 대해 δ를 찾을 수 없습니다.<br>함수 또는 입력값을 확인하세요.</b></div>", unsafe_allow_html=True)
         found_delta = None
-        if st.button("그래프 그리기 및 δ-ε 시각화"):
+    if st.button("그래프 그리기 및 δ-ε 시각화", key="draw_graph_delta_epsilon_2"):
             # 모든 ε에 대해 δ(최대 δ) 값 계산
             epsilons = np.linspace(0.01, 2.0, 30)
             deltas = []
