@@ -200,8 +200,8 @@ with col1:
                     break
             deltas.append(found_delta if found_delta else np.nan)
         # 표로 δ-ε 관계 출력
-    st.markdown("<div class='result-card'><b>ε-δ 관계표</b></div>", unsafe_allow_html=True)
-    st.dataframe({"ε": epsilons, "δ(최대)": deltas})
+        st.markdown("<div class='result-card'><b>ε-δ 관계표</b></div>", unsafe_allow_html=True)
+        st.dataframe({"ε": epsilons, "δ(최대)": deltas})
 
         # 선택한 ε에 대한 δ 및 그래프 시각화
         delta_candidates = np.linspace(epsilon/2, 2*epsilon, 500)
