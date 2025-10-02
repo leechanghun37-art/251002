@@ -63,7 +63,34 @@ func_types = {
 with st.sidebar:
     st.header("함수 종류 및 입력")
     func_name = st.selectbox("함수 종류 선택", list(func_types.keys()))
-    if func_types[func_name]["expr"] is None:
+    # n차 함수 계수 입력
+    if func_name == "일차함수 y=ax+b":
+        a_coef = st.number_input("a (일차항 계수)", value=1.0)
+        b_coef = st.number_input("b (상수항)", value=0.0)
+        func_str = f"{a_coef}*x + {b_coef}"
+        domain = func_types[func_name]["domain"]
+    elif func_name == "이차함수 y=ax^2+bx+c":
+        a_coef = st.number_input("a (이차항 계수)", value=1.0)
+        b_coef = st.number_input("b (일차항 계수)", value=0.0)
+        c_coef = st.number_input("c (상수항)", value=0.0)
+        func_str = f"{a_coef}*x**2 + {b_coef}*x + {c_coef}"
+        domain = func_types[func_name]["domain"]
+    elif func_name == "삼차함수 y=ax^3+...":
+        a_coef = st.number_input("a (삼차항 계수)", value=1.0)
+        b_coef = st.number_input("b (이차항 계수)", value=0.0)
+        c_coef = st.number_input("c (일차항 계수)", value=0.0)
+        d_coef = st.number_input("d (상수항)", value=0.0)
+        func_str = f"{a_coef}*x**3 + {b_coef}*x**2 + {c_coef}*x + {d_coef}"
+        domain = func_types[func_name]["domain"]
+    elif func_name == "사차함수 y=ax^4+...":
+        a_coef = st.number_input("a (사차항 계수)", value=1.0)
+        b_coef = st.number_input("b (삼차항 계수)", value=0.0)
+        c_coef = st.number_input("c (이차항 계수)", value=0.0)
+        d_coef = st.number_input("d (일차항 계수)", value=0.0)
+        e_coef = st.number_input("e (상수항)", value=0.0)
+        func_str = f"{a_coef}*x**4 + {b_coef}*x**3 + {c_coef}*x**2 + {d_coef}*x + {e_coef}"
+        domain = func_types[func_name]["domain"]
+    elif func_types[func_name]["expr"] is None:
         func_str = st.text_input("함수 f(x) 직접 입력 (예: x**3 + 2*x)", value="x**2")
         domain = st.slider("그래프 x축 범위", min_value=-20.0, max_value=20.0, value=(-10.0, 10.0), step=0.1)
     else:
