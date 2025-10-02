@@ -116,7 +116,7 @@ with col1:
                 x_left = np.linspace(a-delta, a, 50)
                 x_right = np.linspace(a, a+delta, 50)
                 x_vals = np.concatenate([x_left, x_right])
-                fx_vals = f(x_vals)
+                fx_vals = np.array([f(xi) for xi in x_vals])
                 valid = np.isfinite(fx_vals)
                 if np.all(valid) and np.all(np.abs(fx_vals[valid] - fa) < eps):
                     found_delta = delta
@@ -133,7 +133,7 @@ with col1:
             x_left = np.linspace(a-delta, a, 50)
             x_right = np.linspace(a, a+delta, 50)
             x_vals = np.concatenate([x_left, x_right])
-            fx_vals = f(x_vals)
+            fx_vals = np.array([f(xi) for xi in x_vals])
             valid = np.isfinite(fx_vals)
             if np.all(valid) and np.all(np.abs(fx_vals[valid] - fa) < epsilon):
                 found_delta = delta
