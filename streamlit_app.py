@@ -91,8 +91,39 @@ with st.sidebar:
         func_str = f"{a_coef}*x**4 + {b_coef}*x**3 + {c_coef}*x**2 + {d_coef}*x + {e_coef}"
         domain = func_types[func_name]["domain"]
     elif func_types[func_name]["expr"] is None:
-        func_str = st.text_input("함수 f(x) 직접 입력 (예: x**3 + 2*x)", value="x**2")
+        func_str = st.text_input("함수 f(x) 직접 입력 (예: a*x**3 + b*x**2 + c*x + d)", value="a*x**2 + b*x + c")
         domain = st.slider("그래프 x축 범위", min_value=-20.0, max_value=20.0, value=(-10.0, 10.0), step=0.1)
+        # 계수 자동 추출 및 입력 UI 생성
+        import re
+        coef_names = sorted(set(re.findall(r'([a-zA-Z])\*x', func_str)))
+        coef_inputs = {}
+        for coef in coef_names:
+            coef_inputs[coef] = st.number_input(f"{coef} (계수)", value=1.0 if coef=='a' else 0.0)
+        # 상수항 추출
+        if 'c' in func_str and 'c' not in coef_names:
+            coef_inputs['c'] = st.number_input("c (상수항)", value=0.0)
+        # 함수식에 계수값 반영
+        def user_func(x):
+            local_dict = {**coef_inputs, 'x': x, 'np': np}
+            try:
+                return eval(func_str, local_dict)
+            except Exception:
+                return np.nan
+        f = user_func
+        st.markdown("""
+        **계수의 역할:**
+        - 최고차항: 그래프의 양 끝 방향과 폭 결정
+        - 상수항: y절편(그래프의 상하 이동)
+        - 중간항: 그래프의 굴곡, 극값, 변곡점 결정
+        """)
+    else:
+        func_str = func_types[func_name]["expr"]
+        domain = func_types[func_name]["domain"]
+        def f(x):
+            try:
+                return eval(func_str, {"x": x, "np": np, "__builtins__": {}})
+            except Exception:
+                return np.nan
     else:
         func_str = func_types[func_name]["expr"]
         domain = func_types[func_name]["domain"]
@@ -115,11 +146,12 @@ with col2:
     a = st.slider("연속성 판정 점 a", min_value=float(domain[0]), max_value=float(domain[1]), value=float((domain[0]+domain[1])/2), step=0.1)
     epsilon = st.slider("ε 값 (양수)", min_value=0.001, max_value=2.0, value=0.1, step=0.001)
 
-def f(x):
-    try:
-        return eval(func_str, {"x": x, "np": np, "__builtins__": {}})
-    except Exception:
-        return np.nan
+if func_types[func_name]["expr"] is not None and func_name not in ["직접 입력"]:
+    def f(x):
+        try:
+            return eval(func_str, {"x": x, "np": np, "__builtins__": {}})
+        except Exception:
+            return np.nan
 
 with col1:
     st.subheader("함수 그래프 및 δ-ε 시각화")
