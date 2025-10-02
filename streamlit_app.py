@@ -35,8 +35,8 @@ def f(x):
         return np.nan
 
 if st.button("δ 및 연속성 시각화"):
-    # δ 계산: 양방향, 수치적 오차 보정
-    delta_candidates = np.linspace(0.00001, 2, 10000)
+    # δ 계산: ε과 비슷한 크기에서만 탐색 (최소 ε/2 ~ 최대 2ε)
+    delta_candidates = np.linspace(epsilon/2, 2*epsilon, 500)
     found_delta = None
     fa = f(a)
     for delta in delta_candidates:
