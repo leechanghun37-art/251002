@@ -237,21 +237,75 @@ with col1:
             st.markdown(f"<div class='result-card'><b>적당한 δ 값:</b> {found_delta:.6f}<br>모든 x∈({a-found_delta:.3f}, {a+found_delta:.3f})에서 |f(x)-f(a)|&lt;{epsilon} 입니다.</div>", unsafe_allow_html=True)
         else:
             st.markdown("<div class='result-card' style='background:#ffebee;border-color:#ffcdd2;color:#c62828;'><b>해당 ε에 대해 δ를 찾을 수 없습니다.<br>함수 또는 입력값을 확인하세요.</b></div>", unsafe_allow_html=True)
-        ax.set_xlabel('x', fontsize=13)
-        ax.set_ylabel('f(x)', fontsize=13)
-        # y축 자동 스케일링
-        if np.any(mask):
-            y_min, y_max = np.nanmin(y_plot[mask]), np.nanmax(y_plot[mask])
-            if y_max-y_min < 1e-6:
-                ax.set_ylim(fa-1, fa+1)
-            else:
-                ax.set_ylim(y_min-(y_max-y_min)*0.2, y_max+(y_max-y_min)*0.2)
-        ax.legend(fontsize=12, loc='best')
-        ax.grid(True, alpha=0.3)
-        st.pyplot(fig)
+        found_delta = None
+        if st.button("그래프 그리기 및 δ-ε 시각화"):
+            # 모든 ε에 대해 δ(최대 δ) 값 계산
+            epsilons = np.linspace(0.01, 2.0, 30)
+            deltas = []
+            fa = f(a)
+            for eps in epsilons:
+                delta_candidates = np.linspace(eps/2, 2*eps, 500)
+                found_delta = None
+                for delta in delta_candidates:
+                    x_left = np.linspace(a-delta, a, 50)
+                    x_right = np.linspace(a, a+delta, 50)
+                    x_vals = np.concatenate([x_left, x_right])
+                    fx_vals = np.array([f(xi) for xi in x_vals])
+                    valid = np.isfinite(fx_vals)
+                    if np.all(valid) and np.all(np.abs(fx_vals[valid] - fa) < eps):
+                        found_delta = delta
+                        break
+                deltas.append(found_delta if found_delta else np.nan)
+            # 표로 δ-ε 관계 출력
+            st.markdown("<div class='result-card'><b>ε-δ 관계표</b></div>", unsafe_allow_html=True)
+            st.dataframe({"ε": epsilons, "δ(최대)": deltas})
 
-    # 연속성 판정 안내
-    if found_delta:
-        st.markdown(f"<div class='result-card'><b>함수는 x={a}에서 ε={epsilon}에 대해 연속입니다.</b></div>", unsafe_allow_html=True)
-    else:
-        st.markdown(f"<div class='result-card' style='background:#ffebee;border-color:#ffcdd2;color:#c62828;'><b>함수는 x={a}에서 ε={epsilon}에 대해 연속이 아닐 수 있습니다.</b></div>", unsafe_allow_html=True)
+            # 선택한 ε에 대한 δ 및 그래프 시각화
+            delta_candidates = np.linspace(epsilon/2, 2*epsilon, 500)
+            found_delta = None
+            for delta in delta_candidates:
+                x_left = np.linspace(a-delta, a, 50)
+                x_right = np.linspace(a, a+delta, 50)
+                x_vals = np.concatenate([x_left, x_right])
+                fx_vals = np.array([f(xi) for xi in x_vals])
+                valid = np.isfinite(fx_vals)
+                if np.all(valid) and np.all(np.abs(fx_vals[valid] - fa) < epsilon):
+                    found_delta = delta
+                    break
+            x_plot = np.linspace(domain[0], domain[1], 1200)
+            def safe_f(xx):
+                try:
+                    vals = np.array([f(xi) for xi in xx])
+                except Exception:
+                    vals = np.full_like(xx, np.nan)
+                return vals
+            y_plot = safe_f(x_plot)
+            mask = np.isfinite(y_plot)
+            fig, ax = plt.subplots(figsize=(9,5))
+            ax.plot(x_plot[mask], y_plot[mask], label="$f(x)$", color='#1976d2', linewidth=2)
+            if not np.all(mask):
+                ax.scatter(x_plot[~mask], np.full(np.sum(~mask), 0), color='#d32f2f', marker='x', label='불연속/정의불가')
+            ax.axvline(a, color='#c62828', linestyle='--', label='$a$', linewidth=2)
+            ax.axhline(fa, color='#388e3c', linestyle='--', label='$f(a)$', linewidth=2)
+            ax.fill_between(x_plot, fa-epsilon, fa+epsilon, color='#fffde7', alpha=0.5, label='$|f(x)-f(a)|<\epsilon$')
+            if found_delta:
+                ax.axvspan(a-found_delta, a+found_delta, color='#b3e5fc', alpha=0.4, label='$|x-a|<\delta$')
+                st.markdown(f"<div class='result-card'><b>적당한 δ 값:</b> {found_delta:.6f}<br>모든 x∈({a-found_delta:.3f}, {a+found_delta:.3f})에서 |f(x)-f(a)|&lt;{epsilon} 입니다.</div>", unsafe_allow_html=True)
+            else:
+                st.markdown("<div class='result-card' style='background:#ffebee;border-color:#ffcdd2;color:#c62828;'><b>해당 ε에 대해 δ를 찾을 수 없습니다.<br>함수 또는 입력값을 확인하세요.</b></div>", unsafe_allow_html=True)
+            ax.set_xlabel('x', fontsize=13)
+            ax.set_ylabel('f(x)', fontsize=13)
+            if np.any(mask):
+                y_min, y_max = np.nanmin(y_plot[mask]), np.nanmax(y_plot[mask])
+                if y_max-y_min < 1e-6:
+                    ax.set_ylim(fa-1, fa+1)
+                else:
+                    ax.set_ylim(y_min-(y_max-y_min)*0.2, y_max+(y_max-y_min)*0.2)
+            ax.legend(fontsize=12, loc='best')
+            ax.grid(True, alpha=0.3)
+            st.pyplot(fig)
+
+            if found_delta:
+                st.markdown(f"<div class='result-card'><b>함수는 x={a}에서 ε={epsilon}에 대해 연속입니다.</b></div>", unsafe_allow_html=True)
+            else:
+                st.markdown(f"<div class='result-card' style='background:#ffebee;border-color:#ffcdd2;color:#c62828;'><b>함수는 x={a}에서 ε={epsilon}에 대해 연속이 아닐 수 있습니다.</b></div>", unsafe_allow_html=True)
