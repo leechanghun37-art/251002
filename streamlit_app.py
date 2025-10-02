@@ -103,6 +103,7 @@ with col1:
     - **빨간 x**: 불연속점/정의불가
     - **초록선**: $f(a)$, **빨간선**: $a$
     """, unsafe_allow_html=True)
+    found_delta = None
     if st.button("그래프 그리기 및 δ-ε 시각화"):
         # 모든 ε에 대해 δ(최대 δ) 값 계산
         epsilons = np.linspace(0.01, 2.0, 30)
