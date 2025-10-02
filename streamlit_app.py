@@ -1,3 +1,4 @@
+
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,32 +12,39 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-.main {
-    background-color: #f7f7fa;
+.main {background-color: #f7f7fa;}
+.stApp {font-family: 'Noto Sans KR', 'Roboto', Arial, sans-serif;}
+.stTitle, .stHeader, .stMarkdown h2 {color: #1976d2;}
+.stMarkdown code {background: #eaf1fb; color: #1a2b3c;}
+.result-card {
+  background: linear-gradient(90deg,#e3f2fd 60%,#fff 100%);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #b3c6e0;
+  padding: 1.2em 1em;
+  margin-bottom: 1em;
+  border: 1px solid #bbdefb;
 }
-.stApp {
-    font-family: 'Noto Sans KR', 'Roboto', Arial, sans-serif;
-}
-.stTitle, .stHeader, .stMarkdown h2 {
-    color: #2a3f5f;
-}
-.stMarkdown code {
-    background: #eaf1fb;
-    color: #1a2b3c;
+.graph-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px #b3c6e0;
+  padding: 1.5em 1em;
+  margin-bottom: 1.5em;
+  border: 1px solid #e3f2fd;
 }
 </style>
 """, unsafe_allow_html=True)
 
-st.title("수학 함수 그래프 & ε-δ 연속성 시각화")
 st.markdown("""
-이 페이지는 수학에서 자주 사용하는 주요 함수들의 그래프 개형과, 코시의 연속 정의(ε-δ)를 시각적으로 탐구할 수 있도록 설계되었습니다. 
-
-**함수 종류를 선택하거나 직접 입력**하면, 해당 함수의 그래프와 연속성(δ, ε)을 직관적으로 확인할 수 있습니다. 
-
-함수의 정의역, 불연속점, 점근선, 치역 등도 자동으로 반영됩니다. 
-
----
-""")
+<div style='background:linear-gradient(90deg,#1976d2 60%,#fff 100%);border-radius:16px;padding:1.5em 1em;margin-bottom:1.5em;'>
+<h1 style='color:#fff;font-weight:700;'>수학 함수 그래프 & ε-δ 연속성 시각화</h1>
+<p style='color:#e3f2fd;font-size:1.1em;'>
+이 페이지는 수학에서 자주 사용하는 주요 함수들의 그래프 개형과, <b>코시의 연속 정의(ε-δ)</b>를 시각적으로 탐구할 수 있도록 설계되었습니다.<br>
+함수 종류를 선택하거나 직접 입력하면, 해당 함수의 그래프와 연속성(δ, ε)을 직관적으로 확인할 수 있습니다.<br>
+함수의 정의역, 불연속점, 점근선, 치역 등도 자동으로 반영됩니다.
+</p>
+</div>
+""", unsafe_allow_html=True)
 
 
 # 주요 함수 종류별 대표 수식, 정의역, 그래프 스타일
@@ -61,6 +69,7 @@ func_types = {
 
 # 사이드바: 함수 선택 및 입력
 with st.sidebar:
+    st.image("https://img.icons8.com/color/96/graph.png", width=64)
     st.header("함수 종류 및 입력")
     func_name = st.selectbox("함수 종류 선택", list(func_types.keys()))
     # n차 함수 계수 입력
@@ -125,16 +134,24 @@ with st.sidebar:
             except Exception:
                 return np.nan
     st.markdown("""
-    - **상수함수**: y=c
-    - **일차함수**: y=ax+b
-    - **이차함수**: y=ax²+bx+c
-    - **삼차/사차함수**: y=ax³+.../y=ax⁴+...
-    - **유리함수**: y=1/x
-    - **무리함수**: y=√x
-    - **지수/로그함수**: y=exp(x), y=log(x)
-    - **삼각함수**: y=sin(x), y=cos(x), y=tan(x)
-    - **절댓값/계단/가우스**: y=|x|, y=floor(x), y=exp(-x²)
-    """)
+    <div style='background:#e3f2fd;border-radius:8px;padding:0.7em 0.5em;margin-bottom:1em;'>
+    <b>함수 예시</b><br>
+    <span style='color:#1976d2'>상수함수</span>: y=c<br>
+    <span style='color:#1976d2'>일차함수</span>: y=ax+b<br>
+    <span style='color:#1976d2'>이차함수</span>: y=ax²+bx+c<br>
+    <span style='color:#1976d2'>삼차/사차함수</span>: y=ax³+.../y=ax⁴+...<br>
+    <span style='color:#1976d2'>유리함수</span>: y=1/x<br>
+    <span style='color:#1976d2'>무리함수</span>: y=√x<br>
+    <span style='color:#1976d2'>지수/로그함수</span>: y=exp(x), y=log(x)<br>
+    <span style='color:#1976d2'>삼각함수</span>: y=sin(x), y=cos(x), y=tan(x)<br>
+    <span style='color:#1976d2'>절댓값/계단/가우스</span>: y=|x|, y=floor(x), y=exp(-x²)
+    </div>
+    <div style='font-size:0.95em;color:#333;'>
+    <b>도움말</b><br>
+    - 직접 입력 시 계수(a, b, c, ...)를 변수로 사용 가능<br>
+    - δ, ε는 연속성의 수치적 의미를 시각적으로 보여줍니다<br>
+    </div>
+    """, unsafe_allow_html=True)
 
 
 col1, col2 = st.columns([2,1])
@@ -151,13 +168,17 @@ if func_types[func_name]["expr"] is not None and func_name not in ["직접 입�
             return np.nan
 
 with col1:
-    st.subheader("함수 그래프 및 δ-ε 시각화")
     st.markdown("""
-    - **파란 곡선**: 함수 $f(x)$의 그래프
-    - **노란 영역**: $|f(x)-f(a)|<\epsilon$ 범위
-    - **하늘색 영역**: $|x-a|<\delta$ 범위
-    - **빨간 x**: 불연속점/정의불가
-    - **초록선**: $f(a)$, **빨간선**: $a$
+    <div class='graph-card'>
+    <h3 style='color:#1976d2;'>함수 그래프 및 δ-ε 시각화</h3>
+    <ul style='font-size:1.05em;'>
+    <li><span style='color:#1976d2'>파란 곡선</span>: 함수 <b>f(x)</b>의 그래프</li>
+    <li><span style='color:#ffd600'>노란 영역</span>: <b>|f(x)-f(a)|&lt;ε</b> 범위</li>
+    <li><span style='color:#4fc3f7'>하늘색 영역</span>: <b>|x-a|&lt;δ</b> 범위</li>
+    <li><span style='color:#d32f2f'>빨간 x</span>: 불연속점/정의불가</li>
+    <li><span style='color:#388e3c'>초록선</span>: <b>f(a)</b>, <span style='color:#c62828'>빨간선</span>: <b>a</b></li>
+    </ul>
+    </div>
     """, unsafe_allow_html=True)
     found_delta = None
     if st.button("그래프 그리기 및 δ-ε 시각화"):
@@ -179,8 +200,8 @@ with col1:
                     break
             deltas.append(found_delta if found_delta else np.nan)
         # 표로 δ-ε 관계 출력
-        st.markdown("#### ε-δ 관계표")
-        st.dataframe({"ε": epsilons, "δ(최대)": deltas})
+    st.markdown("<div class='result-card'><b>ε-δ 관계표</b></div>", unsafe_allow_html=True)
+    st.dataframe({"ε": epsilons, "δ(최대)": deltas})
 
         # 선택한 ε에 대한 δ 및 그래프 시각화
         delta_candidates = np.linspace(epsilon/2, 2*epsilon, 500)
@@ -213,10 +234,9 @@ with col1:
         # δ 범위
         if found_delta:
             ax.axvspan(a-found_delta, a+found_delta, color='#b3e5fc', alpha=0.4, label='$|x-a|<\delta$')
-            st.success(f"적당한 δ 값: {found_delta:.6f}")
-            st.info(f"모든 x∈({a-found_delta:.3f}, {a+found_delta:.3f})에서 |f(x)-f(a)|<{epsilon} 입니다.")
+            st.markdown(f"<div class='result-card'><b>적당한 δ 값:</b> {found_delta:.6f}<br>모든 x∈({a-found_delta:.3f}, {a+found_delta:.3f})에서 |f(x)-f(a)|&lt;{epsilon} 입니다.</div>", unsafe_allow_html=True)
         else:
-            st.error("해당 ε에 대해 δ를 찾을 수 없습니다. 함수 또는 입력값을 확인하세요.")
+            st.markdown("<div class='result-card' style='background:#ffebee;border-color:#ffcdd2;color:#c62828;'><b>해당 ε에 대해 δ를 찾을 수 없습니다.<br>함수 또는 입력값을 확인하세요.</b></div>", unsafe_allow_html=True)
         ax.set_xlabel('x', fontsize=13)
         ax.set_ylabel('f(x)', fontsize=13)
         # y축 자동 스케일링
@@ -232,6 +252,6 @@ with col1:
 
     # 연속성 판정 안내
     if found_delta:
-        st.success(f"함수는 x={a}에서 ε={epsilon}에 대해 연속입니다.")
+        st.markdown(f"<div class='result-card'><b>함수는 x={a}에서 ε={epsilon}에 대해 연속입니다.</b></div>", unsafe_allow_html=True)
     else:
-        st.warning(f"함수는 x={a}에서 ε={epsilon}에 대해 연속이 아닐 수 있습니다.")
+        st.markdown(f"<div class='result-card' style='background:#ffebee;border-color:#ffcdd2;color:#c62828;'><b>함수는 x={a}에서 ε={epsilon}에 대해 연속이 아닐 수 있습니다.</b></div>", unsafe_allow_html=True)
