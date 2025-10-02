@@ -49,11 +49,16 @@ if st.button("δ 및 연속성 시각화"):
         if np.all(valid) and np.all(np.abs(fx_vals[valid] - fa) < epsilon):
             found_delta = delta
             break
-    # 시각화
-    fig, ax = plt.subplots(figsize=(7,4))
-    x_plot = np.linspace(a-2, a+2, 400)
+    # 시각화 개선: 더 넓은 범위, 불연속점/예외처리, y축 자동 스케일링
+    fig, ax = plt.subplots(figsize=(8,5))
+    x_plot = np.linspace(a-3, a+3, 1200)
     y_plot = f(x_plot)
-    ax.plot(x_plot, y_plot, label=f"f(x)")
+    # 불연속점/예외값 처리
+    mask = np.isfinite(y_plot)
+    ax.plot(x_plot[mask], y_plot[mask], label=f"f(x)", color='blue')
+    # 불연속점 표시
+    if not np.all(mask):
+        ax.scatter(x_plot[~mask], np.full(np.sum(~mask), np.nanmean(y_plot[mask])), color='red', marker='x', label='불연속/정의불가')
     ax.axvline(a, color='r', linestyle='--', label='a')
     ax.axhline(fa, color='g', linestyle='--', label='f(a)')
     ax.fill_between(x_plot, fa-epsilon, fa+epsilon, color='yellow', alpha=0.3, label='ε 범위')
@@ -65,6 +70,10 @@ if st.button("δ 및 연속성 시각화"):
         st.error("해당 ε에 대해 δ를 찾을 수 없습니다. 함수 또는 입력값을 확인하세요.")
     ax.set_xlabel('x')
     ax.set_ylabel('f(x)')
+    # y축 자동 스케일링
+    if np.any(mask):
+        y_min, y_max = np.nanmin(y_plot[mask]), np.nanmax(y_plot[mask])
+        ax.set_ylim(y_min-(y_max-y_min)*0.2, y_max+(y_max-y_min)*0.2)
     ax.legend()
     st.pyplot(fig)
 
