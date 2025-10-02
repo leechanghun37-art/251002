@@ -106,37 +106,54 @@ with col1:
     - **초록선**: $f(a)$, **빨간선**: $a$
     """, unsafe_allow_html=True)
     if st.button("그래프 그리기 및 δ-ε 시각화"):
-    # δ 계산: ε과 비슷한 크기에서만 탐색 (최소 ε/2 ~ 최대 2ε)
-    delta_candidates = np.linspace(epsilon/2, 2*epsilon, 500)
-    found_delta = None
-    fa = f(a)
-    for delta in delta_candidates:
-        x_left = np.linspace(a-delta, a, 50)
-        x_right = np.linspace(a, a+delta, 50)
-        x_vals = np.concatenate([x_left, x_right])
-        fx_vals = f(x_vals)
-        valid = np.isfinite(fx_vals)
-        if np.all(valid) and np.all(np.abs(fx_vals[valid] - fa) < epsilon):
-            found_delta = delta
-            break
-    # 그래프 x축: 함수 정의역 전체
-    x_plot = np.linspace(domain[0], domain[1], 1200)
-    def safe_f(xx):
-        try:
-            vals = np.array([f(xi) for xi in xx])
-        except Exception:
-            vals = np.full_like(xx, np.nan)
-        return vals
-    y_plot = safe_f(x_plot)
-    mask = np.isfinite(y_plot)
+        # 모든 ε에 대해 δ(최대 δ) 값 계산
+        epsilons = np.linspace(0.01, 2.0, 30)
+        deltas = []
+        fa = f(a)
+        for eps in epsilons:
+            delta_candidates = np.linspace(eps/2, 2*eps, 500)
+            found_delta = None
+            for delta in delta_candidates:
+                x_left = np.linspace(a-delta, a, 50)
+                x_right = np.linspace(a, a+delta, 50)
+                x_vals = np.concatenate([x_left, x_right])
+                fx_vals = f(x_vals)
+                valid = np.isfinite(fx_vals)
+                if np.all(valid) and np.all(np.abs(fx_vals[valid] - fa) < eps):
+                    found_delta = delta
+                    break
+            deltas.append(found_delta if found_delta else np.nan)
+        # 표로 δ-ε 관계 출력
+        st.markdown("#### ε-δ 관계표")
+        st.dataframe({"ε": epsilons, "δ(최대)": deltas})
+
+        # 선택한 ε에 대한 δ 및 그래프 시각화
+        delta_candidates = np.linspace(epsilon/2, 2*epsilon, 500)
+        found_delta = None
+        for delta in delta_candidates:
+            x_left = np.linspace(a-delta, a, 50)
+            x_right = np.linspace(a, a+delta, 50)
+            x_vals = np.concatenate([x_left, x_right])
+            fx_vals = f(x_vals)
+            valid = np.isfinite(fx_vals)
+            if np.all(valid) and np.all(np.abs(fx_vals[valid] - fa) < epsilon):
+                found_delta = delta
+                break
+        x_plot = np.linspace(domain[0], domain[1], 1200)
+        def safe_f(xx):
+            try:
+                vals = np.array([f(xi) for xi in xx])
+            except Exception:
+                vals = np.full_like(xx, np.nan)
+            return vals
+        y_plot = safe_f(x_plot)
+        mask = np.isfinite(y_plot)
         fig, ax = plt.subplots(figsize=(9,5))
         ax.plot(x_plot[mask], y_plot[mask], label="$f(x)$", color='#1976d2', linewidth=2)
-        # 불연속점 표시 (None 처리)
         if not np.all(mask):
             ax.scatter(x_plot[~mask], np.full(np.sum(~mask), 0), color='#d32f2f', marker='x', label='불연속/정의불가')
         ax.axvline(a, color='#c62828', linestyle='--', label='$a$', linewidth=2)
         ax.axhline(fa, color='#388e3c', linestyle='--', label='$f(a)$', linewidth=2)
-        # ε 범위
         ax.fill_between(x_plot, fa-epsilon, fa+epsilon, color='#fffde7', alpha=0.5, label='$|f(x)-f(a)|<\epsilon$')
         # δ 범위
         if found_delta:
