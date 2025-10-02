@@ -124,9 +124,6 @@ with st.sidebar:
                 return eval(func_str, {"x": x, "np": np, "__builtins__": {}})
             except Exception:
                 return np.nan
-    else:
-        func_str = func_types[func_name]["expr"]
-        domain = func_types[func_name]["domain"]
     st.markdown("""
     - **상수함수**: y=c
     - **일차함수**: y=ax+b
